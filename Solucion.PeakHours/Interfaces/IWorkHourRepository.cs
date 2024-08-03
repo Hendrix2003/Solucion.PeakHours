@@ -1,5 +1,5 @@
 ﻿
-using SolucionCND.Shared.CompletedHours;
+using SolucionPeakHours.Shared.CompletedHours;
 using SolucionPeakHours.Models;
 
 namespace SolucionPeakHours.Interfaces

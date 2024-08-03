@@ -7,13 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="Images\**" />
-		<Content Remove="Images\**" />
-		<EmbeddedResource Remove="Images\**" />
-		<None Remove="Images\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="ClosedXML" Version="0.102.1" />
 		<PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.14" />
@@ -24,15 +17,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SolucionPeakHours.Shared\SolucionPeakHours.Shared.csproj" />
+		<ProjectReference Include="..\SolucionPeakHours.Shared\SolucionPeakHours.Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Helpers\" />
-	  <Folder Include="Interfaces\" />
-	  <Folder Include="Services\" />
+		<Folder Include="Images\" />
 	</ItemGroup>
 
-
+	<ItemGroup>
+		<None Include="wwwroot\JCW-01.png" />
+	</ItemGroup>
 
 </Project>

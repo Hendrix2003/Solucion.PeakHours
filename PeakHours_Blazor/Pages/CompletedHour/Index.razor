@@ -1,0 +1,196 @@
+﻿@page "/completedHour/index"
+@using SolucionPeakHours.Shared.CompletedHours
+@using SolucionPeakHours.Shared.ProgHours
+
+@inject IWorkHourService WorkHourService;
+@inject IEmailService EmailService;
+@inject SweetAlertService Swal;
+@inject NavigationManager navigationManager;
+@inject IJSRuntime jsRuntime;
+
+
+<h3>Horas Completas</h3>
+
+<div class="row mt-2 mb-3">
+       <div class="col-md-6">
+        <RadzenButton Click="@(() => OpenFormDialog("Registrar horas de programación"))"
+                      Style="background-color:#003053"
+                      Visible="HasPermission"
+                      Text="Horas Trabajadas" />
+       </div>
+</div>
+
+
+<div class="row mt-3 mb-3">
+    <div class="col-md-6 d-flex align-items-center">
+        <RadzenLabel Text="Fecha de inicio:" Style="color: black; font-weight: bold; font-size: 0.9rem; margin-right: 0.2rem;"></RadzenLabel>
+        <RadzenDatePicker @bind-Value="startDateFilter" Change="@FilterData"></RadzenDatePicker>
+    </div>
+
+    <div class="col-md-6 d-flex align-items-center justify-content-end">
+        <RadzenLabel Text="Fecha de fin:" Style="color: black; font-weight: bold; font-size: 0.9rem; margin-right: 0.5rem;"></RadzenLabel>
+        <RadzenDatePicker @bind-Value="endDateFilter" Change="@FilterData" style="margin-right: 0.5rem;"></RadzenDatePicker>
+
+        <RadzenButton Click=@(args => ExportExcel("Descargar Excel"))
+                      Text="Excel"
+                      Visible="HasPermission"
+                      Icon="get_app"
+                      Style="background-color: darkgreen" />
+    </div>
+</div>
+
+
+
+
+
+<RadzenDataGrid Data="WorkHours"
+                Responsive="true"
+                TItem="WorkHourDTO" 
+                AllowFiltering="true"
+                AllowColumnResize
+                FilterMode="FilterMode.Simple"
+                AllowPaging="true"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                AllowSorting="true"
+                PageSizeOptions="@pageSizeOptions" 
+                ShowPagingSummary="@showPagerSummary"
+                PagingSummaryFormat="@pagingSummaryFormat">
+    
+    <EmptyTemplate>
+        <div class="text-center">
+            <i style="font-size:3rem" class="text-muted bx bx-search-alt mt-2"></i>
+            <p class="text-muted">La lista está vacía.</p>
+        </div>
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Property="ProgHourEntity.FactoryStaffEntity.Id" 
+                              Title="Cod. Funcionario" 
+                              TextAlign="TextAlign.Center" 
+                            />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Property="ProgHourEntity.FactoryStaffEntity.FullName" 
+                              Title="Nombre funcionario" 
+                              TextAlign="TextAlign.Center" 
+                               />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO"
+                              Property="ProgHourEntity.FactoryStaffEntity.Area"
+                              Title="Area"
+                              TextAlign="TextAlign.Center" />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO"
+                              Property="ProgHourEntity.FactoryStaffEntity.Manager"
+                              Title="Gestor"
+                              TextAlign="TextAlign.Center"
+                              />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Property="HoursWorked" 
+                              Title="Cant. Hora" 
+                              TextAlign="TextAlign.Center" 
+                               />
+        
+        <RadzenDataGridColumn TItem="WorkHourDTO"
+                               Property="ProgHourEntity.FactoryStaffEntity.TotalHoursPerMonth"
+                              Title="Cant. Horas Mes" 
+                              TextAlign="TextAlign.Center" 
+                               />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Property="HourType" 
+                              Title="Tipo de Hora" 
+                              TextAlign="TextAlign.Center" 
+                              />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Property="ReasonsRelize" 
+                              Title="Motivos" 
+                              TextAlign="TextAlign.Center"
+                              >
+            <Template Context="reason">
+                <RadzenButton Icon="open_in_new"
+                              Size="ButtonSize.Small"
+                              ButtonStyle="ButtonStyle.Info"
+                              Click="@(() => OpenViewReason(reason.ReasonsRelize!))" />
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Property="FechaOld" 
+                              Title="Fecha Programada"
+                              TextAlign="TextAlign.Center"
+                              />
+
+        <RadzenDataGridColumn TItem="WorkHourDTO"
+                               Title="Estado"
+                               Width="116.734px"
+                               Visible="IsSupervisor"
+                               TextAlign="TextAlign.Center">
+            <Template Context="status">
+                @if (status.AreaManagerApproved)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Apr. G.A"/>    
+                }
+                else
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="En espera" />
+                }
+
+                @if (status.FactoryManagerApproved)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Apr. G.F" />
+                }
+                else
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="En espera" />
+                }
+
+                @if (status.AreaManagerApproved && status.FactoryManagerApproved)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Aceptada" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Title="Solicitudes" 
+                              Width="116.734px"
+                              Visible="CanApprove"
+                              TextAlign="TextAlign.Center">
+            <Template Context="workHour">
+                @{
+                    var status = SetStatusRequest(workHour);
+                }
+
+                <RadzenButton ButtonStyle="@status.ButtonStyle" 
+                              Icon="done" 
+                              Click="@(() => ApproveRequestByUserRole(workHour))"
+                              Size="ButtonSize.Small">
+                    @status.Text
+                </RadzenButton>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="WorkHourDTO" 
+                              Title="Acciones" 
+                              TextAlign="TextAlign.Center"
+                              Width="104px">
+            <Template Context="workHour">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                              Visible="CanApprove"
+                              Icon="delete" 
+                              Size="ButtonSize.Small" 
+                              Click="@(() => DeleteWorkHour((int)workHour.Id!))" />
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" Icon="edit" Size="ButtonSize.Small" Click="@(() => OpenFormDialog("Modificar hora Trabajada", workHour))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<ProgHourDTO>? grid;
+
+   
+}

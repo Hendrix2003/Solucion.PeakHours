@@ -1,4 +1,4 @@
-﻿namespace SolucionCND.Shared.CompletedHours
+﻿namespace SolucionPeakHours.Shared.CompletedHours
 {
     public class ApproveResponse
     {

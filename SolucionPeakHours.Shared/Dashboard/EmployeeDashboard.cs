@@ -1,6 +1,4 @@
-﻿
-
-using SolucionPeakHours.Shared.CompletedHours;
+﻿using SolucionPeakHours.Shared.CompletedHours;
 using SolucionPeakHours.Shared.ProgHours;
 
 namespace SolucionPeakHours.Shared.Dashboard

@@ -1,4 +1,4 @@
-﻿namespace SolucionCND.Shared.Dashboard
+﻿namespace SolucionPeakHours.Shared.Dashboard
 {
     public class StaticsResponse
     {

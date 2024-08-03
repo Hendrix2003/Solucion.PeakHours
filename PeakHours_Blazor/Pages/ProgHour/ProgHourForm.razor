@@ -1,0 +1,74 @@
+﻿@page "/Crear_Persona"
+@page "/empleado/{idEmpleadoEditar:int}"
+@using SolucionPeakHours.Shared.ProgHours
+
+
+
+<RadzenTemplateForm Data="ProhHourModel" 
+                    TItem="ProgHourDTO"
+                    Submit="OnValidSubmit">
+    <div class="row mb-2">
+        <div class="col">
+            <RadzenStack Orientation="Orientation.Vertical"
+                         AlignItems="AlignItems.Center"
+                         class="mt-2">
+
+                <RadzenFormField Text="Identificador" Style="width:100%">
+                    <RadzenNumeric @bind-Value="FactoryStaffId"
+                                   Disabled="factoryStaffIdFieldDisable"
+                                   TValue="int?"
+                                   ShowUpDown="false" 
+                                   @onkeyup="SearchFactoryStaffWithKeyUp" />
+                </RadzenFormField>
+                
+                <RadzenFormField Text="Nombre empleado" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.FullName"
+                                   Disabled/>
+                 </RadzenFormField>
+
+                 <RadzenFormField Text="Gestor" Style="width:100%">
+                     <RadzenTextBox @bind-Value="FactoryStaffModel.Manager"
+                                    Disabled/>
+                 </RadzenFormField>
+
+                 <RadzenFormField Text="Posicion" Style="width:100%">
+                     <RadzenTextBox @bind-Value="FactoryStaffModel.Position" Disabled />
+                 </RadzenFormField>
+
+                 <RadzenButton Text="@btnText" 
+                               ButtonType="ButtonType.Submit"
+                               Style="width:100%; background: #003053" />
+             </RadzenStack>
+        </div>
+        
+        <div class="col">
+             <RadzenStack Orientation="Orientation.Vertical"
+                          AlignItems="AlignItems.Center"
+                          class="mt-2">
+                 <RadzenFormField Text="Cantidad hora" Style="width:100%">
+                     <RadzenNumeric Name="HourCant" @bind-Value="ProhHourModel.HourCant" />
+
+                     <RadzenRequiredValidator Text="Campo requerido" Component="HourCant" Popup="true" />
+                 </RadzenFormField>
+
+                 <RadzenFormField Text="Fecha de programación" Style="width:100%">
+                     <RadzenDatePicker @bind-Value="ProhHourModel.ProgDate"
+                                       ShowTime="true" 
+                                       HourFormat="12"
+                                       Min="@DateTime.Today"
+                                       DateFormat="MM/dd/yyyy h:mm tt"
+                                       Name="ProgDate"
+                                     />
+
+                     <RadzenRequiredValidator Text="Campo requerido" Component="ProgDate" Popup="true" />
+                 </RadzenFormField>
+
+                 <RadzenFormField Text="Motivo" Style="width:100%">
+                     <RadzenTextArea @bind-Value="ProhHourModel.Reasons" Name="Reasons"/>
+
+                     <RadzenRequiredValidator Text="Campo requerido" Component="Reasons" Popup="true"/>
+                 </RadzenFormField>
+             </RadzenStack>
+        </div>
+    </div>
+</RadzenTemplateForm>

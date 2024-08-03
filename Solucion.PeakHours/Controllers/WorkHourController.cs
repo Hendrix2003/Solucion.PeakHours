@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SolucionCND.Shared.CompletedHours;
 using SolucionPeakHours.Interfaces;
 using SolucionPeakHours.Models;
 using SolucionPeakHours.Shared.CompletedHours;

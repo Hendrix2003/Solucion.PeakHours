@@ -1,0 +1,56 @@
+﻿@using SolucionPeakHours.Shared.FactoryStaff
+<RadzenTemplateForm Data="FactoryStaffModel"
+                    TItem="FactoryStaffDTO"
+                    Submit="OnValidSubmit">
+    <div class="row mb-2">
+        <div class="col">
+            <RadzenStack Orientation="Orientation.Vertical"
+                         AlignItems="AlignItems.Center"
+                         class="mt-2">
+                <RadzenFormField Text="Cod. Funcionario" Style="width:100%">
+                    <RadzenNumeric Name="Id" @bind-Value="FactoryStaffModel.Id" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Id" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Nombre Completo" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.FullName" Name="FullName" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="FullName" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Gestor" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.Manager" Name="Manager" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Manager" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenButton Text="@btnText"
+                              ButtonType="ButtonType.Submit"
+                              Style="width:100%; background: #003053" />
+            </RadzenStack>
+        </div>
+        <div class="col">
+            <RadzenStack Orientation="Orientation.Vertical"
+                         AlignItems="AlignItems.Center"
+                         class="mt-2">
+                <RadzenFormField Text="Posicion" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.Position" Name="Position" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Position" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Linea" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.Line" Name="Line" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Line" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Area" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.Area" Name="Area" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Area" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Sub Area" Style="width:100%">
+                    <RadzenTextBox @bind-Value="FactoryStaffModel.SubArea" Name="SubArea" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="SubArea" Popup="true" />
+                </RadzenFormField>
+            </RadzenStack>
+        </div>
+    </div>
+</RadzenTemplateForm>

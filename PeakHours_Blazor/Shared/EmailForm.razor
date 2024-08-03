@@ -1,0 +1,49 @@
+﻿@using SolucionPeakHours.Shared.UserAccount
+
+<RadzenTemplateForm Data="EmailModel"
+                    TItem="EmailDTO"
+                    Submit="OnValidSubmit">
+    <div class="row mb-2" style="border-radius: 20px;">
+        <div class="col">
+            <RadzenStack Orientation="Orientation.Vertical"
+                         AlignItems="AlignItems.Center"
+                         class="mt-2">
+                <RadzenFormField Text="Seleccione el usuario" Style="width:100%">
+                    <RadzenDropDown @bind-Value="RegistrationModel.Email"
+                                    Name="EmployeeId"
+                                    Data="@Users"
+                                    TextProperty="Email"
+                                    ValueProperty="Email"
+                                    Style="width:300px"
+                                    FilterOperator="StringFilterOperator.StartsWith"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    AllowFiltering="true"
+                                    Change="OnUserSelected" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Para" Style="width:100%">
+                    <RadzenTextBox @bind-Value="EmailModel.To" Name="To" style="border-radius: 5px;" />
+
+                    <RadzenRequiredValidator Text="Campo requerido" Component="To" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Asunto" Style="width:100%">
+                    <RadzenTextBox @bind-Value="EmailModel.Subject" Name="Subject" style="border-radius: 5px;" />
+
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Subject" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="Descripción" Style="width:100%">
+                    <RadzenTextArea @bind-Value="EmailModel.Body" Name="Body" style="border-radius: 5px;" />
+
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Body" Popup="true" />
+                </RadzenFormField>
+
+                <RadzenButton Text="Enviar"
+                              ButtonType="ButtonType.Submit"
+                              Style="width:50%; background: #003053; border-radius: 5px;" />
+            </RadzenStack>
+        </div>
+    </div>
+</RadzenTemplateForm>
+

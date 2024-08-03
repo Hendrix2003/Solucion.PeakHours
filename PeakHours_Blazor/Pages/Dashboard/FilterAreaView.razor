@@ -1,0 +1,66 @@
+﻿@using PeakHours_Blazor.Models
+@using static PeakHours_Blazor.Pages.Dashboard.Index
+@inject DialogService DialogService;
+@inject IEmployeeService EmpleadoService;
+
+<RadzenFormField Style="width:100%; margin-bottom:10px" Text="Seleccione una area">
+    <RadzenDropDown Data="AreaDataList"
+                    TextProperty="Text"
+                    ValueProperty="Text"
+                    AllowFiltering
+                    @bind-Value="AreaFilter.Area" />
+</RadzenFormField>
+
+<RadzenFormField Style="width:100%; margin-bottom: 10px" Text="Filtrar por los ultimos: ">
+     <RadzenDropDown Data="AreaDataDayList"
+                     TextProperty="Text"
+                     ValueProperty="Value"
+                     AllowFiltering
+                     @bind-Value="AreaFilter.AreaDay" />
+</RadzenFormField>
+
+<RadzenButton Style="background-color:var(--rz-info-darker)"
+              Text="Filtrar" 
+              Click="OnClose"
+              Size="ButtonSize.Small"/>
+
+ @code {
+    [Parameter]
+    public string Area { get; set; }
+
+    [Parameter]
+    public int AreaDay { get; set; }
+
+    private AreaFilter AreaFilter = new AreaFilter();
+
+    List<DropDownData> AreaDataList = new List<DropDownData>();
+    List<DropDownData> AreaDataDayList = new List<DropDownData>();
+
+    private void OnClose()
+    {
+        DialogService.Close(AreaFilter);
+    }
+
+    private async Task LoadDropDownData()
+    {
+        AreaDataList = new List<DropDownData>();
+        var areas = await EmpleadoService.GetAreas();
+        foreach (var area in areas)
+        {
+            AreaDataList.Add(new DropDownData { Text = area});
+        }
+       
+
+        AreaDataDayList = new List<DropDownData>();
+        AreaDataDayList.Add(new DropDownData { Text = "Ultimos 15 días", Value = 15 });
+        AreaDataDayList.Add(new DropDownData { Text = "Ultimos 30 días", Value = 30 });
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadDropDownData();
+
+        AreaFilter.Area = Area;
+        AreaFilter.AreaDay = AreaDay;
+    }
+}

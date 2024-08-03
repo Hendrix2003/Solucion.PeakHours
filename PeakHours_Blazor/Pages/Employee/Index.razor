@@ -1,0 +1,103 @@
+﻿@page "/employee/index"
+
+@inject IEmployeeService empleadoService;
+@inject SweetAlertService Swal;
+@inject NavigationManager navigationManager;
+@inject IJSRuntime jsRuntime;
+
+<h3>Empleados</h3>
+
+<div class="row mt-2 mb-3">
+    <div class="col-md-6">
+        <RadzenButton Click="@(() => OpenFormDialog("Registrar nuevo Empleado"))"
+                      Style="background-color:#003053"
+                      Visible="IsAdmin"
+                      Text="Nuevo Empleado" />
+    </div>
+
+    <div class="col-md-6">
+        <div class="d-flex justify-content-end">
+            <RadzenButton Click="ExportExcel" 
+                          Text="Excel" 
+                          Icon="get_app" 
+                          Visible="IsAdmin"
+                          Style="background-color: darkgreen" />
+        </div>
+    </div>
+</div>
+
+
+<RadzenDataGrid PageSize="5"
+                Style="margin-bottom:30px"
+                AllowFiltering="true" 
+                AllowColumnResize="true"
+                FilterMode="FilterMode.Simple" 
+                AllowPaging="true" 
+                Data="Employees" 
+                TItem="FactoryStaffDTO" 
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                AllowSorting="true"
+                PageSizeOptions="@pageSizeOptions" 
+                ShowPagingSummary="@showPagerSummary"
+                PagingSummaryFormat="@pagingSummaryFormat">
+    <EmptyTemplate>
+        <div class="text-center">
+            <i style="font-size:3rem" class="text-muted bx bx-search-alt mt-2"></i>
+            <p class="text-muted">La lista está vacía.</p>
+        </div>
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="Id" 
+                              Title="ID" />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="FullName" 
+                              Title="Nombre Empleado"  />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="Manager" 
+                              Title="Gestor" />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="Area" 
+                              Title="Area" />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="SubArea" 
+                              Title="Sub Area"  />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="Position" 
+                              Title="Posición"  />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO" 
+                              Property="Line" 
+                              Title="Linea"  />
+
+        <RadzenDataGridColumn TItem="FactoryStaffDTO"
+                              Visible="IsAdmin"
+                              Title="Acciones" 
+                              TextAlign="TextAlign.Center">
+            <Template Context="employee">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" 
+                              Icon="delete" 
+                              Size="ButtonSize.Small" 
+                              Click="@(() => DeleteEmployee((int)employee.Id!))" />
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" 
+                              Icon="edit" 
+                              Size="ButtonSize.Small" 
+                              Click="@(() => OpenFormDialog("Modificar hora Trabajada", employee))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<FactoryStaffDTO>? grid;
+    string pagingSummaryFormat = "Mostrando la página {0} de {1} <b>(total de {2} registros)</b>";
+
+    IEnumerable<int> pageSizeOptions = Enumerable.Range(1, 300);
+    bool showPagerSummary = true;
+}

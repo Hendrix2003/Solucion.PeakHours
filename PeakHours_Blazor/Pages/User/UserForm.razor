@@ -1,0 +1,69 @@
+﻿@using SolucionPeakHours.Shared.UserAccount
+@inject SweetAlertService Swal;
+
+
+<RadzenTemplateForm Data="RegistrationModel"
+                    TItem="RegisterDTO"
+                    Submit="OnValidSubmit">
+    <div class="row mb-2">
+        <div class="col">
+            <RadzenStack Orientation="Orientation.Vertical"
+                         AlignItems="AlignItems.Center"
+                         class="mt-2">
+                <RadzenFormField Text="Seleccione el empleado"
+                                 Style="width:100%">
+                    <RadzenDropDown @bind-Value="RegistrationModel.FactoryStaffEntityId"
+                                    Name="EmployeeId"
+                                    Data="@Employees"
+                                    TextProperty="FullName"
+                                    ValueProperty="Id"
+                                    Style="width:300px"
+                                    Disabled="@IsEdit"
+                                    FilterOperator="StringFilterOperator.StartsWith"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    AllowFiltering="true" />
+                </RadzenFormField>
+                <RadzenFormField Text="Correo electronico"
+                                 Style="width:300px">
+                    <RadzenTextBox @bind-Value="RegistrationModel.Email" Name="Email" />
+                    <RadzenRequiredValidator Text="Campo requerido" Component="Email" Popup="true" />
+                    <RadzenEmailValidator Component="Email"
+                                          Text="Introducir un correo electrónico válido"
+                                          Popup="true"
+                                          Style="position: absolute" />
+                </RadzenFormField>
+
+                <RadzenButton Text="@btnText"
+                              ButtonType="ButtonType.Submit"
+                              Style="width:100%; background: #003053" />
+            </RadzenStack>
+        </div>
+        <div class="col">
+            <RadzenStack Orientation="Orientation.Vertical"
+                             AlignItems="AlignItems.Center"
+                             class="mt-2">
+                @if (!IsEdit)
+                {
+                    
+                    <RadzenFormField Text="Contraseña"
+                                     Style="width:300px">
+                        <RadzenPassword @bind-Value="RegistrationModel.Pwd" Name="Password" />
+                        <RadzenRequiredValidator Text="Campo requerido" Component="Password" Popup="true" />
+                    </RadzenFormField>
+                }
+
+                <RadzenFormField Text="Seleccionar permiso"
+                                 Style="width:300px">
+                    <RadzenDropDown @bind-Value="RegistrationModel.Role"
+                                    Name="Role"
+                                    Data="@Roles"
+                                    Style="width:100%"
+                                    FilterOperator="StringFilterOperator.StartsWith"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    AllowFiltering="true" />
+                </RadzenFormField>
+
+            </RadzenStack>
+        </div>
+    </div>
+</RadzenTemplateForm>

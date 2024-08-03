@@ -1,17 +1,54 @@
-﻿@inherits LayoutComponentBase
+﻿@using PeakHours_Blazor.Helpers
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject BeamAuthenticationStateProviderHelper BeamAuthenticationStateProviderHelper;
+
+<RadzenDialog />
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @if (!IsLoginView())
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+
+
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        @if (!IsLoginView())
+        {
+            <div class="top-row px-4 d-flex justify-content-between">
+                <RadzenButton Click="@(() => OpenFormDialogEmail("Enviar Correo"))"
+                              Style="background-color:#003053"
+                              Visible="HasPermission"
+                              Text="Email" />
+
+                <a @onclick="Logout" href="javascript:void(0)">Cerrar sesión</a>
+            </div>
+
+        }
 
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    [Inject] BeamAuthenticationStateProviderHelper? beamAuthenticationStateProviderHelper { get; set; }
+    [Inject] LocalStorageHelper localStorageHelper { get; set; }
+
+    private bool IsLoginView()
+    {
+        return NavigationManager.Uri.EndsWith("/signin", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task Logout()
+    {
+        var autenticacionExt = (BeamAuthenticationStateProviderHelper)beamAuthenticationStateProviderHelper!;
+        await autenticacionExt.GetAuthenticationStateAsync();
+        await localStorageHelper.RemoveItem("token");
+        NavigationManager.NavigateTo("/account/signin", true);
+    }
+}

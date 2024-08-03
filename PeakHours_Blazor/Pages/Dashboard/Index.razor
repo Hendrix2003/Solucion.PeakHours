@@ -1,0 +1,445 @@
+﻿@page "/"
+@using PeakHours_Blazor.Helpers
+@using PeakHours_Blazor.Models
+@using PeakHours_Blazor.Pages.CompletedHour
+@using PeakHours_Blazor.Pages.Shared;
+@using SolucionPeakHours.Shared.CompletedHours
+@using SolucionPeakHours.Shared.Dashboard
+@using SolucionPeakHours.Shared.ProgHours
+
+@inject IDashboardService DashboardService
+@inject IWorkHourService WorkHourService;
+@inject DialogService DialogService;
+@inject BeamAuthenticationStateProviderHelper BeamAuthenticationStateProviderHelper;
+
+<PageTitle>Dashboard</PageTitle>
+
+<h3>Resumen</h3>
+
+<hr />
+
+<RadzenStack Gap="1rem"
+             Style="position:relative; margin-bottom: 30px">
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenColumn Size="4">
+            <RadzenCard Style="position:relative; width:340px">
+                <RadzenText TextStyle="TextStyle.H6">
+                    Hrs. Trabajadas
+
+                    <RadzenButton Icon="filter_alt"
+                                  Disabled="@IsAreaFilterVisible"
+                                  Style="color:#000; border-radius:15px"
+                                  Variant="Variant.Flat"
+                                  Size="ButtonSize.Small"
+                                  ButtonType="ButtonType.Button"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Click="OpenAreaFilter"
+                                  Text="@FilterAreaText" />
+                </RadzenText>
+
+                <RadzenText TextStyle="TextStyle.H4" class="rz-color-success" Style="position:absolute; right:1.5rem;">@TotalHoursByArea.Sum(x => x.Cant)</RadzenText>
+                <RadzenChart Style="width: 100%; height: 200px; margin-bottom: -30px;">
+                    <RadzenColumnSeries Data="@TotalHoursByArea"
+                                        ValueProperty="Cant"
+                                        CategoryProperty="Date"
+                                        Title="Cant. Horas"
+                                        Fill="var(--rz-success)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenColumnOptions Margin="10" />
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenCard Style="position:relative; width:340px">
+                <RadzenText TextStyle="TextStyle.H6">
+                    Hrs. Trabajadas
+
+                    <RadzenButton Icon="filter_alt"
+                                  Click="OpenEmployeeFilter"
+                                  Style="color:#000; border-radius:15px"
+                                  Variant="Variant.Flat"
+                                  Size="ButtonSize.Small"
+                                  ButtonType="ButtonType.Button"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Text="@FilterEmployeeText" />
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4"
+                            class="rz-color-info"
+                            Style="position:absolute; right:1.5rem;">@TotalHoursByEmployee.Sum(x => x.Cant)</RadzenText>
+                <RadzenChart Style="width: 100%; height: 200px; margin-bottom: -30px;">
+                    <RadzenColumnSeries Data="@TotalHoursByEmployee"
+                                        ValueProperty="Cant"
+                                        CategoryProperty="Date"
+                                        Title="Cant. Horas"
+                                        Fill="var(--rz-info)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenColumnOptions Margin="10" />
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenCard Style="position:relative; width:338px">
+                <RadzenText TextStyle="TextStyle.H6">Top. Empleados (Código)</RadzenText>
+                <RadzenChart Style="width: 100%; height: 205px; margin-bottom: -30px;">
+                    <RadzenPieSeries Data="@TopEmployees"
+                                     CategoryProperty="Description"
+                                     ValueProperty="Cant"
+                                     Title="Cantidad de Horas" />
+                    <RadzenLegend Visible="true" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenText TextStyle="TextStyle.H6">Listado de empleados</RadzenText>
+
+    <RadzenDataGrid Data="Employees"
+                    TItem="EmployeeDashboard"
+                        AllowFiltering
+                        AllowColumnResize
+                    ExpandMode="DataGridExpandMode.Single"
+                    FilterMode="FilterMode.Simple"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowSorting="true"
+                        AllowPaging
+                    PageSize="5"
+                        Responsive>
+        <EmptyTemplate>
+            <div class="text-center">
+                <i style="font-size:3rem" class="text-muted bx bx-search-alt mt-2"></i>
+                <p class="text-muted">La lista está vacía.</p>
+            </div>
+        </EmptyTemplate>
+        <Columns>
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="Id"
+                                  Title="ID" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="FullName"
+                                  Title="Nombre Empleado" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="Manager"
+                                  Title="Gestor" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="Area"
+                                  Title="Area" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="SubArea"
+                                  Title="Sub Area" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="TotalHoursPerMonth"
+                                  Title="Cant. Horas Mes"
+                                  TextAlign="TextAlign.Center" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="Position"
+                                  Title="Posición" />
+
+            <RadzenDataGridColumn TItem="EmployeeDashboard"
+                                  Property="Line"
+                                  Title="Linea" />
+        </Columns>
+        <Template Context="details">
+            <RadzenCard Style="margin-bottom:20px">
+                Empleado <b>@details.FullName</b>
+            </RadzenCard>
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Horas Completadas">
+                        <RadzenDataGrid AllowFiltering
+                                                    AllowPaging
+                                                    AllowSorting
+                                                    AllowColumnResize
+                                        PageSize="3"
+                                        FilterMode="FilterMode.Simple"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="@details.WorkHours"
+                                        TItem="WorkHourDTO">
+                            <EmptyTemplate>
+                                <div class="text-center">
+                                    <i style="font-size:3rem" class="text-muted bx bx-search-alt mt-2"></i>
+                                    <p class="text-muted">La lista está vacía.</p>
+                                </div>
+                            </EmptyTemplate>
+                            <Columns>
+
+                                <RadzenDataGridColumn TItem="WorkHourDTO"
+                                                      Property="HoursWorked"
+                                                      Title="Cant. Hora"
+                                                      TextAlign="TextAlign.Center" />
+
+                                <RadzenDataGridColumn TItem="WorkHourDTO"
+                                                      Property="HourType"
+                                                      Title="Tipo de Hora"
+                                                      TextAlign="TextAlign.Center" />
+
+                                <RadzenDataGridColumn TItem="WorkHourDTO"
+                                                      Property="ReasonsRelize"
+                                                      Title="Motivos"
+                                                      TextAlign="TextAlign.Center">
+                                    <Template Context="reason">
+                                        <RadzenButton Icon="open_in_new"
+                                                      Size="ButtonSize.Small"
+                                                      ButtonStyle="ButtonStyle.Info"
+                                                      Click="@(() => OpenViewReason(reason.ReasonsRelize!))" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+
+                                <RadzenDataGridColumn TItem="WorkHourDTO"
+                                                      Property="FechaOld"
+                                                      Title="Fecha Programada" />
+
+                                <RadzenDataGridColumn TItem="WorkHourDTO"
+                                                      Property="CreatedAt"
+                                                      Title="Fecha de Creación" />
+
+                                <RadzenDataGridColumn TItem="WorkHourDTO"
+                                                      Title="Solicitudes"
+                                                      Width="113.156px">
+                                    <Template Context="workHour">
+                                        @{
+                                            var status = SetStatusRequest(workHour);
+                                        }
+
+                                        <RadzenButton ButtonStyle="@status.ButtonStyle"
+                                                      Icon="done"
+                                                      Size="ButtonSize.Small">
+                                            @status.Text
+                                        </RadzenButton>
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Horas Solicitadas">
+                        <RadzenDataGrid AllowFiltering
+                                                    AllowPaging
+                                                    AllowSorting
+                                        Data="@details.ProgHours"
+                                        PageSize="3"
+                                        FilterMode="FilterMode.Simple"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        TItem="ProgHourDTO">
+                            <EmptyTemplate>
+                                <div class="text-center">
+                                    <i style="font-size:3rem" class="text-muted bx bx-search-alt mt-2"></i>
+                                    <p class="text-muted">La lista está vacía.</p>
+                                </div>
+                            </EmptyTemplate>
+                            <Columns>
+                                <RadzenDataGridColumn TItem="ProgHourDTO"
+                                                      Property="HourCant"
+                                                      Title="Cant. Hora"
+                                                      TextAlign="TextAlign.Center" />
+
+                                <RadzenDataGridColumn TItem="ProgHourDTO"
+                                                      Property="Reasons"
+                                                      Title="Motivos"
+                                                      TextAlign="TextAlign.Center">
+                                    <Template Context="reason">
+                                        <RadzenButton Icon="open_in_new"
+                                                      Size="ButtonSize.Small"
+                                                      ButtonStyle="ButtonStyle.Info"
+                                                      Click="@(() => OpenViewReason(reason.Reasons!))" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+
+                                <RadzenDataGridColumn TItem="ProgHourDTO"
+                                                      Property="ProgDate"
+                                                      Title="Fecha Programada" />
+
+                                <RadzenDataGridColumn TItem="ProgHourDTO"
+                                                      Property="CreatedAt"
+                                                      Title="Fecha de Creación" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </Template>
+    </RadzenDataGrid>
+</RadzenStack>
+
+
+@code {
+    private List<StaticsResponse> TotalHoursByArea { get; set; } = new List<StaticsResponse>();
+    private List<StaticsResponse> TotalHoursByEmployee { get; set; } = new List<StaticsResponse>();
+    private List<StaticsResponse> TopEmployees { get; set; } = new List<StaticsResponse>();
+    private List<EmployeeDashboard> Employees { get; set; } = new List<EmployeeDashboard>();
+
+    private string FilterAreaText
+    {
+        get => $"{area} ({areaDay})";
+        set
+        {
+            area = value;
+        }
+    }
+    private string FilterEmployeeText
+    {
+        get => $"{employeeId} ({employeeDay})";
+        set
+        {
+            employeeId = int.Parse(value);
+        }
+    }
+
+    private string area = "Gestion";
+    private int areaDay = 15;
+
+    private int employeeId = 97074284;
+    private int employeeDay = 15;
+
+    private bool IsAreaManager = false;
+    private bool IsAdmin = false;
+    private bool HasPermission = true;
+    private bool CanAcceptRequest = true;
+
+    private bool IsAreaFilterVisible = false;
+
+    private async Task OpenAreaFilter()
+    {
+        var dialogResult = await DialogService.OpenAsync<FilterAreaView>(
+            "Filtrar por área"
+            , new Dictionary<string, object>()
+                {
+                { "Area", area },
+                { "AreaDay", areaDay }
+                }
+            , new DialogOptions
+                {
+                    Width = "300px",
+                    Height = "auto",
+                    ShowClose = false
+                });
+
+        if (dialogResult != null)
+        {
+            area = dialogResult.Area;
+            areaDay = dialogResult.AreaDay;
+
+            await GetTotalHoursByArea(area, areaDay);
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenEmployeeFilter()
+    {
+        var dialogResult = await DialogService.OpenAsync<FilterEmployeeView>(
+            "Filtrar por empleado"
+            , new Dictionary<string, object>()
+                {
+                { "EmployeeId", employeeId },
+                { "EmployeeDay", employeeDay }
+                }
+            , new DialogOptions
+                {
+                    Width = "300px",
+                    Height = "auto",
+                    ShowClose = false
+                });
+
+        if (dialogResult != null)
+        {
+            employeeId = dialogResult.EmployeeId;
+            employeeDay = dialogResult.EmployeeDay;
+
+            await GetTotalHoursByEmployee(employeeId, employeeDay);
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetTotalHoursByArea(string area, int lastBy)
+    {
+        TotalHoursByArea = await DashboardService.GetTotalHoursByArea(area, lastBy);
+    }
+
+    private async Task GetTotalHoursByEmployee(int employeeId, int lastBy)
+    {
+        TotalHoursByEmployee = await DashboardService.GetTotalHoursByEmployee(employeeId, lastBy);
+    }
+
+    private async Task GetEmployeesWithMoreHours()
+    {
+        TopEmployees = await DashboardService.GetEmployeesWithMoreHours();
+    }
+
+    private async Task OpenViewReason(string reason)
+    {
+        await DialogService.OpenAsync<ReasonsView>(
+            "Motivo"
+            , new Dictionary<string, object>()
+                    {
+                    { "Reason", reason }
+                    }
+            , new DialogOptions
+                {
+                    Width = "auto",
+                    Height = "auto"
+                });
+    }
+
+    private async Task EvaluateRole()
+    {
+        var authState = await BeamAuthenticationStateProviderHelper!.GetAuthenticationStateAsync();
+
+        IsAreaManager = authState.User.IsInRole("GerenteArea");
+        IsAdmin = authState.User.IsInRole("Administrator");
+
+        IsAreaFilterVisible = !IsAdmin;
+
+        if (!IsAdmin)
+        {
+            area = authState.User.Claims.FirstOrDefault(x => x.Type == "Area")?.Value!;
+            employeeId = 0;
+        }
+    }
+
+    private async Task LoadEmployeesWithDetails()
+    {
+        Employees = await DashboardService.GetEmployeesWithDetails();
+    }
+
+    private SetStatus SetStatusRequest(WorkHourDTO workHour)
+    {
+        var response = new SetStatus();
+
+        if (IsAreaManager)
+        {
+            response.Text = workHour.AreaManagerApproved ? "Aprobado" : "En espera";
+            response.ButtonStyle = workHour.AreaManagerApproved ? ButtonStyle.Success : ButtonStyle.Danger;
+        }
+
+        if (IsAdmin)
+        {
+            response.Text = workHour.FactoryManagerApproved ? "Cambiar Estado" : "Aprobar";
+            response.ButtonStyle = workHour.FactoryManagerApproved ? ButtonStyle.Info : ButtonStyle.Success;
+
+            if (!workHour.AreaManagerApproved)
+            {
+                response.ButtonStyle = ButtonStyle.Danger;
+                response.Text = "En espera";
+            }
+        }
+
+        return response;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEmployeesWithDetails();
+        await EvaluateRole();
+        await GetEmployeesWithMoreHours();
+        await GetTotalHoursByArea("Gestion", 15);
+        await GetTotalHoursByEmployee(97074284, 15);
+    }
+}

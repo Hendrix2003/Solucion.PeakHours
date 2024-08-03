@@ -1,0 +1,56 @@
+﻿@page "/account/signin"
+
+<RadzenRow Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 800px; overflow: hidden;">
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-text-align-center rz-p-12" Style="height: 100%; background-color: var(--rz-info-darker);">
+            <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H2" Class="rz-color-white rz-mb-6">Bienvenido!</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-color-white">¡Inicia sesión para poder registrar tus horas programadas!</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-white">Verifica tus horas programadas y administra de manera más comoda tus horarios.</RadzenText>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-p-12">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-mb-6">
+                Iniciar sesión
+            </RadzenText>
+            <RadzenTemplateForm Data=@("SimpleLogin")>
+                <RadzenLogin Login="HandleLogin"
+                             AllowRegister="false"
+                             AllowResetPassword="false"
+                             AllowRememberMe="true"
+                             RememberMeText="Recordarme"
+                             AutoComplete="true"
+                             LoginText="Acceso"
+                             PasswordText="Contraseña"
+                             UserText="Correo electronico"
+                             PasswordRequired="Contraseña es requerida"
+                             UserRequired="Correo es requerido" />
+            </RadzenTemplateForm>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@if (isLoading)
+{
+    <LoadingOverlay IsVisible="isLoading" />
+}
+
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .rz-button {
+        background: var(--rz-info-darker) !important;
+    }
+
+    .rz-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .rz-text {
+        color: #333;
+    }
+</style>

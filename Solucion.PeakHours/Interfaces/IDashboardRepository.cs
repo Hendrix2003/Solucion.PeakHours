@@ -1,6 +1,4 @@
-﻿
-using SolucionCND.Shared.Dashboard;
-using SolucionPeakHours.Shared.Dashboard;
+﻿using SolucionPeakHours.Shared.Dashboard;
 
 namespace SolucionPeakHours.Repositories
 {

@@ -1,0 +1,74 @@
+﻿@inject DialogService DialogService;
+@inject IEmployeeService EmpleadoService;
+
+<RadzenFormField Style="width:100%; margin-bottom:10px" Text="Seleccione un empleado">
+    <RadzenDropDown Data="EmployeeDataList"
+                    TextProperty="FullName"
+                    ValueProperty="Id"
+                    AllowFiltering
+                    @bind-Value="EmployeeFilter.EmployeeId" />
+</RadzenFormField>
+
+<RadzenFormField Style="width:100%; margin-bottom: 10px" Text="Filtrar por los ultimos: ">
+     <RadzenDropDown Data="EmployeeDataDayList"
+                     TextProperty="Text"
+                     ValueProperty="Value"
+                     AllowFiltering
+                     @bind-Value="EmployeeFilter.EmployeeDay" />
+</RadzenFormField>
+
+<RadzenButton Style="background-color:var(--rz-info-darker)"
+              Text="Filtrar" 
+              Click="OnClose"
+              Size="ButtonSize.Small"/>
+
+
+     @code {
+    [Parameter]
+    public int EmployeeId { get; set; }
+
+    [Parameter]
+    public int EmployeeDay { get; set; }
+
+    [Inject] BeamAuthenticationStateProviderHelper BeamAuthenticationStateProviderHelper { get; set; }
+
+    private bool IsAdmin { get; set; }
+
+    private EmployeeFilter EmployeeFilter = new EmployeeFilter();
+
+    List<FactoryStaffDTO> EmployeeDataList = new List<FactoryStaffDTO>();
+    List<DropDownData> EmployeeDataDayList = new List<DropDownData>
+    {
+        new DropDownData { Text = "Ultimos 15 días", Value = 15 },
+    };
+
+    private async Task LoadDropDownData(string area)
+    {
+        if (IsAdmin)
+        {
+            EmployeeDataList = await EmpleadoService.GetAll();
+        }
+        else
+        {
+            EmployeeDataList = await EmpleadoService.GetEmployeesByArea(area);
+        }
+    }
+
+    private void OnClose()
+    {
+        DialogService.Close(EmployeeFilter);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await BeamAuthenticationStateProviderHelper.GetAuthenticationStateAsync();
+
+        IsAdmin = authState.User.IsInRole("Administrator");
+        var area = authState.User.Claims.FirstOrDefault(x => x.Type == "Area")?.Value;
+
+        await LoadDropDownData(area);
+
+        EmployeeFilter.EmployeeId = EmployeeId;
+        EmployeeFilter.EmployeeDay = EmployeeDay;
+    }
+}

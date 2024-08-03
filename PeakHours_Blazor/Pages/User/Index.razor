@@ -1,0 +1,98 @@
+﻿@page "/user/index"
+
+@inject SweetAlertService Swal;
+
+<h3>Usuarios</h3>
+
+<div class="row mt-2 mb-3">
+    <div class="col-md-6">
+        <RadzenButton Style="background-color:#003053"
+                      Text="Nuevo Usuario" 
+                      Visible="IsAdmin"
+                      Click="@(() => OpenFormDialog("Registrar nuevo usuario"))"/>
+    </div>
+</div>
+
+<RadzenDataGrid PageSize="8"
+                AllowPaging="true"
+                AllowSorting="true"
+                Data="Users"
+                TItem="UserDTO"
+                ColumnWidth="125px"
+                FilterMode="FilterMode.Simple"
+                AllowFiltering
+                AllowColumnResize>
+    <EmptyTemplate>
+        <div class="text-center">
+            <i style="font-size:3rem" class="text-muted bx bx-search-alt mt-2"></i>
+            <p class="text-muted">La lista está vacía.</p>
+        </div>
+    </EmptyTemplate>
+    <Columns>
+
+        <RadzenDataGridColumn TItem="UserDTO"
+                              Property="FactoryStaffEntityId"
+                              Title="Cod. Funcionario" 
+                              TextAlign="TextAlign.Center"/>
+
+        <RadzenDataGridColumn TItem="UserDTO"
+                              Property="FactoryStaffEntity.FullName"
+                              Title="Nombre Empleado" />
+
+        <RadzenDataGridColumn TItem="UserDTO"
+                              Property="Email"
+                              Title="Correo electronico" />
+
+        <RadzenDataGridColumn TItem="UserDTO"
+                              Property="Role"
+                              Visible="IsAdmin"
+                              Title="Permiso" />
+
+        <RadzenDataGridColumn TItem="UserDTO"
+                              Visible="HasPermission"
+                              Property="AllowEmergencyTime"
+                              Filterable="false"
+                              TextAlign="TextAlign.Center"
+                              Title="Hora emergencial">
+                <Template Context="user">
+                    @switch(user.AllowEmergencyTime)
+                    {
+                        case true:
+                            <RadzenButton ButtonStyle="ButtonStyle.Success"
+                                          Icon="check"
+                                          Size="ButtonSize.Small"
+                                          Disabled="false"
+                                          Click="@(async() => await CheckEmergencyTimePermissionAsync(user.Id))" />
+                        break;
+                        case false:
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" 
+                                          Icon="close" 
+                                          Size="ButtonSize.Small" 
+                                          Disabled="false"
+                                          Click="@(async() => await CheckEmergencyTimePermissionAsync(user.Id))" />
+                        break;
+                    }
+                </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="UserDTO" 
+                              Title="Acciones"
+                              Visible="IsAdmin"
+                              TextAlign="TextAlign.Center"
+                              Filterable="false">
+            <Template Context="user">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" 
+                              Icon="delete"
+                              Visible="IsAdmin"
+                              Size="ButtonSize.Small" 
+                              Click="@(() => DeleteUser(user.Id!))" />
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" 
+                              Icon="edit" 
+                              Visible="IsAdmin"
+                              Size="ButtonSize.Small" 
+                              Click="@(() => OpenFormDialog("Modificar Usuario", user))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+

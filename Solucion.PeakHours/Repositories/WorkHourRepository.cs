@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SolucionCND.Shared.CompletedHours;
+using SolucionPeakHours.Shared.CompletedHours;
 using SolucionPeakHours.Interfaces;
 using SolucionPeakHours.Models;
 using SolucionPeakHours.Persistence;
